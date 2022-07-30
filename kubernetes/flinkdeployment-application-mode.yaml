@@ -1,0 +1,23 @@
+apiVersion: flink.apache.org/v1beta1
+kind: FlinkDeployment
+metadata:
+  name: quickstart-app
+spec:
+  image: hub.docker.com/yourorg/quickstart:0.0.1-SNAPSHOT
+  flinkVersion: v1_15
+  flinkConfiguration:
+    taskmanager.numberOfTaskSlots: "2"
+  serviceAccount: flink
+  jobManager:
+    resource:
+      memory: "1g"
+      cpu: 0.5
+  taskManager:
+    resource:
+      memory: "1g"
+      cpu: 0.5
+  job:
+    jarURI: local:///opt/flink/app/quickstart-0.0.1-SNAPSHOT-fat.jar
+    parallelism: 2
+    upgradeMode: stateless
+  restartNonce: 123
