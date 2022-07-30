@@ -2,6 +2,7 @@ plugins {
     id 'scala'
     id 'application'
     id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'com.palantir.docker' version '0.34.0'
 }
 
 wrapper {
@@ -80,4 +81,16 @@ jar {
 
 shadowJar {
     configurations = [project.configurations.flinkShadowJar]
+    archiveClassifier.set('fat')
+}
+
+dockerClean.dependsOn(shadowJar) // run docker related tasks after shadowJar
+docker {
+    name "hub.docker.com/yourorg/quickstart:$version"
+    dockerfile file('Dockerfile')
+
+    def shadowJar = tasks.shadowJar.outputs.files.singleFile
+    files shadowJar // copy shadowJar to docker build context (<project>/build/docker/<shadow jar>)
+    buildArgs([JAR_NAME: "${shadowJar.name}"])
+    noCache true
 }

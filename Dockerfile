@@ -1,0 +1,5 @@
+FROM flink:1.15.1-scala_2.12-java8
+
+ARG JAR_NAME
+ENV JAR_FILEPATH=/opt/flink/app/${JAR_NAME}
+COPY ${JAR_NAME} ${JAR_FILEPATH}
