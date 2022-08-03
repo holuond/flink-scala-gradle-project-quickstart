@@ -5,26 +5,6 @@ plugins {
     id 'com.palantir.docker' version '0.34.0'
 }
 
-wrapper {
-    gradleVersion = '7.5'
-    distributionType = Wrapper.DistributionType.ALL
-}
-
-ext {
-    javaVersion = '1.8'
-    flinkVersion = '1.15.1'
-    scalaBinaryVersion = '2.12'
-    slf4jVersion = '1.7.32'
-    log4jVersion = '2.17.1'
-}
-
-group = 'org.myorg.quickstart'
-version = '0.0.1-SNAPSHOT'
-mainClassName = 'org.myorg.quickstart.DataStreamJob'
-description = "Flink Quickstart Job"
-
-applicationDefaultJvmArgs = ["-Dlog4j.configurationFile=log4j2.properties"]
-
 repositories {
     mavenCentral()
     maven {
@@ -33,6 +13,30 @@ repositories {
             snapshotsOnly()
         }
     }
+}
+
+wrapper {
+    gradleVersion = '7.5'
+    distributionType = Wrapper.DistributionType.ALL
+}
+
+// Key project properties
+project.group = 'org.myorg.quickstart'
+project.version = '0.0.1-SNAPSHOT'
+project.description = "Flink Quickstart Job"
+
+// Extra properties
+ext {
+    javaVersion = '1.8'
+    flinkVersion = '1.15.1'
+    scalaBinaryVersion = '2.12'
+    slf4jVersion = '1.7.32'
+    log4jVersion = '2.17.1'
+}
+
+application {
+    mainClassName = 'org.myorg.quickstart.DataStreamJob'
+    applicationDefaultJvmArgs = ["-Dlog4j.configurationFile=log4j2.properties"]
 }
 
 // NOTE: We cannot use "compileOnly" or "shadow" configurations since then we could not run code
@@ -70,7 +74,6 @@ sourceSets {
 
     javadoc.classpath += configurations.flinkShadowJar
 }
-
 run.classpath = sourceSets.main.runtimeClasspath
 
 jar {
@@ -84,7 +87,6 @@ shadowJar {
     archiveClassifier.set('fat')
 }
 
-dockerClean.dependsOn(shadowJar) // run docker related tasks after shadowJar
 docker {
     name "hub.docker.com/yourorg/quickstart:$version"
     dockerfile file('Dockerfile')
@@ -94,3 +96,6 @@ docker {
     buildArgs([JAR_NAME: "${shadowJar.name}"])
     noCache true
 }
+
+// DAG configuration
+dockerClean.dependsOn(shadowJar) // run docker related tasks after shadowJar
